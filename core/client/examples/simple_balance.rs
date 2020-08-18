@@ -9,6 +9,8 @@ extern crate log;
 
 #[tokio::main]
 async fn main() {
+    let log_level = std::env::var("RUST_LOG").unwrap_or("info".to_owned());
+    std::env::set_var("RUST_LOG", log_level);
     env_logger::init();
     info!("Simple balance check example.");
     let pub_key = "7cfbf8aac6b460bf27a58e9720cf51db45b438e7";
