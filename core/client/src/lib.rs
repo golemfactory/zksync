@@ -9,5 +9,6 @@ extern crate log;
 // pub mod zksync_account;
 pub mod wallet;
 pub mod rpc_client;
+pub mod models;
 
 // use crypto_exports::franklin_crypto;
