@@ -1,12 +1,13 @@
 // Built-in imports
 use std::str::FromStr;
+use std::collections::HashMap;
 // External uses
 use jsonrpc_core::types::response::Output;
 use num::BigUint;
 // Workspace uses
 use models::node::{
     tx::{FranklinTx, PackedEthSignature, TxHash},
-    Address,
+    Address, Token
 };
 use crate::models::AccountInfoResp;
 // Local uses
@@ -126,6 +127,17 @@ impl RpcClient {
         Ok(OperationState { executed, verified })
     }
 
+    /// Gets all tokens
+    pub async fn get_tokens(&self) -> Result<HashMap<String, Token>, failure::Error> {
+        let msg = JsonRpcRequest::get_tokens();
+
+        let ret = self.post(&msg).await?;
+        debug!("{:?}", ret);
+        let tokens =
+            serde_json::from_value(ret).expect("failed to parse account request response");
+        Ok(tokens)
+    }
+
     /// Performs a POST query to the JSON RPC endpoint,
     /// and decodes the response, returning the decoded `serde_json::Value`.
     /// `Ok` is returned only for successful calls, for any kind of error
@@ -229,6 +241,10 @@ mod messages {
             params.push(serde_json::to_value(address).expect("serialization fail"));
             params.push(serde_json::to_value(token_symbol).expect("serialization fail"));
             Self::create("get_tx_fee", params)
+        }
+
+        pub fn get_tokens() -> Self {
+            Self::create("tokens", Vec::new())
         }
     }
 }
