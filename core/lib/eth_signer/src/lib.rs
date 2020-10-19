@@ -5,11 +5,13 @@ use error::SignerError;
 use zksync_types::tx::TxEthSignature;
 use zksync_types::{Address, H256};
 
+pub use external_signer::{ExternalEthSigner, ExternalSigner};
 pub use json_rpc_signer::JsonRpcSigner;
 pub use pk_signer::PrivateKeySigner;
 pub use raw_ethereum_tx::RawTransaction;
 
 pub mod error;
+pub mod external_signer;
 pub mod json_rpc_signer;
 pub mod pk_signer;
 pub mod raw_ethereum_tx;
@@ -18,6 +20,7 @@ pub mod raw_ethereum_tx;
 pub enum EthereumSigner {
     PrivateKey(PrivateKeySigner),
     JsonRpc(JsonRpcSigner),
+    External(ExternalEthSigner),
 }
 
 impl EthereumSigner {
@@ -40,6 +43,7 @@ impl EthereumSigner {
         match self {
             EthereumSigner::PrivateKey(pk_signer) => pk_signer.sign_message(message),
             EthereumSigner::JsonRpc(json_rpc_signer) => json_rpc_signer.sign_message(message).await,
+            EthereumSigner::External(external_signer) => external_signer.sign_message(message).await,
         }
     }
 
@@ -50,6 +54,9 @@ impl EthereumSigner {
             EthereumSigner::JsonRpc(json_rpc_signer) => {
                 json_rpc_signer.sign_transaction(raw_tx).await
             }
+            EthereumSigner::External(external_signer) => {
+                external_signer.sign_transaction(raw_tx).await
+            }
         }
     }
 
@@ -58,6 +65,7 @@ impl EthereumSigner {
         match self {
             EthereumSigner::PrivateKey(pk_signer) => pk_signer.address(),
             EthereumSigner::JsonRpc(json_rpc_signer) => Ok(json_rpc_signer.address()?),
+            EthereumSigner::External(external_signer) => Ok(external_signer.address()?),
         }
     }
 }
