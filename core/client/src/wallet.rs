@@ -14,6 +14,7 @@ use crate::zksync_account::ZksyncAccount;
 
 
 pub static ETH_SIGN_MESSAGE: &str = "Access zkSync account.\n\nOnly sign this message for a trusted client!";
+pub static ETH_SIGN_POSTFIX: &str = "\nChain ID: {}.";
 
 pub enum BalanceState {
     Committed,
